@@ -1,0 +1,61 @@
+using System;
+using System.Security.Cryptography;// імпортують
+
+class Program
+{
+    static void Main() //початок головної функції Main та виводять на екран меню з трьома опціями.
+    {
+        Console.WriteLine("Меню:");
+        Console.WriteLine("1. Згенерувати послідовність випадкових чисел");
+        Console.WriteLine("2. Порівняти елементи послідовності");
+        Console.WriteLine("3. Вийти з програми");
+
+        bool exit = false;// виход з програми
+        RandomNumberGenerator rng = RandomNumberGenerator.Create();//створюється об'єкт, який генерує чисела.
+
+        while (!exit)
+        {
+            Console.Write("Виберіть опцію: ");//Користувач вводить цифру для вибору опції
+            string option = Console.ReadLine();//вибір зберігається у змінній 
+
+            switch (option)
+            {
+                case "1":
+                    Console.Write("Введіть довжину послідовності: ");
+                    int length = int.Parse(Console.ReadLine());//отримує значення від користувача потім перетворюється на ціле число за допомогою методу int.Parse()
+                    byte[] randomBytes = new byte[length];//Створюється масив 
+                    rng.GetBytes(randomBytes);//заповнює масив
+                    Console.WriteLine("Згенерована послідовність випадкових чисел:");
+                    foreach (byte b in randomBytes)//виводиться на екран,розділений пробілами (foreach)
+                    {
+                        Console.Write(b + " ");
+                    }
+                    Console.WriteLine();//відступ
+                    break;
+
+                case "2":
+                    Console.Write("Введіть кількість спроб порівняння: ");
+                    int attempts = int.Parse(Console.ReadLine());//значення перетворюється на ціле
+                    for (int i = 0; i < attempts; i++)//цикл змінної i від 0 до attempts - 1
+                    {
+                        byte[] bytes1 = new byte[4];// створюються два масиви bytes1 і bytes2 типу byte з довжиною 4
+                        byte[] bytes2 = new byte[4];
+                        rng.GetBytes(bytes1);//заповнює обидва масиви випадковими байтами.
+                        rng.GetBytes(bytes2);
+                        int num1 = BitConverter.ToInt32(bytes1, 0);//обидва масиви перетворюються на цілі числа
+                        int num2 = BitConverter.ToInt32(bytes2, 0);
+                        Console.WriteLine($"Спроба {i + 1}: {num1} vs {num2}");
+                    }
+                    break;
+
+                case "3":// призводить до виходу з циклу та завершення програми
+                    exit = true;
+                    break;
+
+                default://якщо користувач не вміє писати або читати
+                    Console.WriteLine("Невірна опція. Спробуйте ще раз.");
+                    break;
+            }
+        }
+    }
+}
