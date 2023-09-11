@@ -1,25 +1,92 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.3.32922.545
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{ED74BACB-AB1C-4096-BD0B-214CACC43B3D}"
-EndProject
-Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{ED74BACB-AB1C-4096-BD0B-214CACC43B3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ED74BACB-AB1C-4096-BD0B-214CACC43B3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ED74BACB-AB1C-4096-BD0B-214CACC43B3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ED74BACB-AB1C-4096-BD0B-214CACC43B3D}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {B9E7557D-AC33-4697-836F-92DD7A1BB3C4}
-	EndGlobalSection
-EndGlobal
+﻿using System;
+
+class Program
+{
+    static void Main()
+    {
+        bool exit = false;
+        Random random = new Random();
+
+        while (!exit)
+        {
+            Console.WriteLine("Меню:");
+            Console.WriteLine("1. Згенерувати послідовність псевдовипадкових чисел");
+            Console.WriteLine("2. Порівняти елементи послідовності для однакових початкових значень");
+            Console.WriteLine("3. Порівняти елементи послідовності для різних початкових значень");
+            Console.WriteLine("4. Вийти з програми");
+
+            Console.Write("Виберіть опцію: ");
+            int option = int.Parse(Console.ReadLine());
+            Console.WriteLine();
+
+            switch (option)
+            {
+                case 1:
+                    Console.Write("Введіть кількість чисел для генерації: ");
+                    int count = int.Parse(Console.ReadLine());
+                    Console.WriteLine();
+
+                    Console.WriteLine("Послідовність псевдовипадкових чисел:");
+                    for (int i = 0; i < count; i++)
+                    {
+                        Console.WriteLine(random.Next());
+                    }
+
+                    Console.WriteLine();
+                    break;
+
+                case 2:
+                    Console.Write("Введіть початкове значення для порівняння: ");
+                    int startValue1 = int.Parse(Console.ReadLine());
+                    Console.WriteLine();
+
+                    Console.Write("Введіть кількість чисел для порівняння: ");
+                    int count1 = int.Parse(Console.ReadLine());
+                    Console.WriteLine();
+
+                    Console.WriteLine("Порівняння елементів послідовності для однакових початкових значень:");
+                    random = new Random(startValue1);
+                    int previousValue1 = random.Next();
+                    for (int i = 1; i < count1; i++)
+                    {
+                        int currentValue1 = random.Next();
+                        Console.WriteLine($"Елемент {i}: {previousValue1} - {currentValue1} {(previousValue1 == currentValue1 ? "рівні" : "не рівні")}");
+                        previousValue1 = currentValue1;
+                    }
+
+                    Console.WriteLine();
+                    break;
+
+                case 3:
+                    Console.Write("Введіть початкове значення для порівняння: ");
+                    int startValue2 = int.Parse(Console.ReadLine());
+                    Console.WriteLine();
+
+                    Console.Write("Введіть кількість чисел для порівняння: ");
+                    int count2 = int.Parse(Console.ReadLine());
+                    Console.WriteLine();
+
+                    Console.WriteLine("Порівняння елементів послідовності для різних початкових значень:");
+                    for (int i = 0; i < count2; i++)
+                    {
+                        random = new Random(startValue2 + i);
+                        int previousValue2 = random.Next();
+                        int currentValue2 = random.Next();
+                        Console.WriteLine($"Елемент {i + 1}: {previousValue2} - {currentValue2} {(previousValue2 == currentValue2 ? "рівні" : "не рівні")}");
+                    }
+
+                    Console.WriteLine();
+                    break;
+
+                case 4:
+                    exit = true;
+                    break;
+
+                default:
+                    Console.WriteLine("Невірний вибір опції. Спробуйте ще раз.");
+                    Console.WriteLine();
+                    break;
+            }
+        }
+    }
+}
