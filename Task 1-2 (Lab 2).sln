@@ -1,0 +1,138 @@
+using System;
+using System.IO;
+using System.Security.Cryptography;
+using System.Text;
+
+class Program
+{
+    static void Main()
+    {
+        Console.OutputEncoding = Encoding.UTF8;
+
+        while (true)
+        {
+            Console.WriteLine("Меню:");
+            Console.WriteLine("1. Зашифрувати файл");
+            Console.WriteLine("2. Розшифрувати файл");
+            Console.WriteLine("3. Вихід");
+            Console.Write("Виберіть опцію (1-3): ");
+
+            int choice;
+            if (int.TryParse(Console.ReadLine(), out choice))
+            {
+                switch (choice)
+                {
+                    case 1:
+                        EncryptFile();
+                        break;
+                    case 2:
+                        DecryptFile();
+                        break;
+                    case 3:
+                        return;
+                    default:
+                        Console.WriteLine("Невірний вибір. Спробуйте ще раз.");
+                        break;
+                }
+            }
+            else
+            {
+                Console.WriteLine("Невірний вибір. Спробуйте ще раз.");
+            }
+
+            Console.WriteLine();
+        }
+    }
+
+    static void EncryptFile()
+    {
+        Console.Write("Введіть шлях до файлу для шифрування: ");
+        string filePath = Console.ReadLine();
+
+        if (File.Exists(filePath))
+        {
+            Console.Write("Введіть пароль для шифрування: ");
+            string password = Console.ReadLine();
+
+            if (!string.IsNullOrEmpty(password))
+            {
+                string encryptedFilePath = Path.ChangeExtension(filePath, ".dat");
+
+                using (FileStream inputFileStream = new FileStream(filePath, FileMode.Open))
+                using (FileStream encryptedFileStream = new FileStream(encryptedFilePath, FileMode.Create))
+                using (Aes aes = Aes.Create())
+                {
+                    byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+                    byte[] salt = new byte[16];
+
+                    using (Rfc2898DeriveBytes keyDerivationFunction = new Rfc2898DeriveBytes(passwordBytes, salt, 10000))
+                    {
+                        aes.Key = keyDerivationFunction.GetBytes(32);
+                        aes.IV = keyDerivationFunction.GetBytes(16);
+                    }
+
+                    using (CryptoStream cryptoStream = new CryptoStream(encryptedFileStream, aes.CreateEncryptor(), CryptoStreamMode.Write))
+                    {
+                        inputFileStream.CopyTo(cryptoStream);
+                    }
+                }
+
+                Console.WriteLine("Файл успішно зашифровано.");
+            }
+            else
+            {
+                Console.WriteLine("Пароль не може бути порожнім.");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Файл не існує.");
+        }
+    }
+
+    static void DecryptFile()
+    {
+        Console.Write("Введіть шлях до файлу для розшифрування: ");
+        string filePath = Console.ReadLine();
+
+        if (File.Exists(filePath))
+        {
+            Console.Write("Введіть пароль для розшифрування: ");
+            string password = Console.ReadLine();
+
+            if (!string.IsNullOrEmpty(password))
+            {
+                string decryptedFilePath = Path.ChangeExtension(filePath, null);
+
+                using (FileStream encryptedFileStream = new FileStream(filePath, FileMode.Open))
+                using (FileStream decryptedFileStream = new FileStream(decryptedFilePath, FileMode.Create))
+                using (Aes aes = Aes.Create())
+                {
+                    byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+                    byte[] salt = new byte[16];
+
+                    using (Rfc2898DeriveBytes keyDerivationFunction = new Rfc2898DeriveBytes(passwordBytes, salt, 10000))
+                    {
+                        aes.Key = keyDerivationFunction.GetBytes(32);
+                        aes.IV = keyDerivationFunction.GetBytes(16);
+                    }
+
+                    using (CryptoStream cryptoStream = new CryptoStream(encryptedFileStream, aes.CreateDecryptor(), CryptoStreamMode.Read))
+                    {
+                        cryptoStream.CopyTo(decryptedFileStream);
+                    }
+                }
+
+                Console.WriteLine("Файл успішно розшифровано.");
+            }
+            else
+            {
+                Console.WriteLine("Пароль не може бути порожнім.");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Файл не існує.");
+        }
+    }
+}
